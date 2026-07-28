@@ -1,15 +1,33 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from langchain_core.messages import HumanMessage
 
-from app.rag.chain import ask
+from app.schemas.chat_request import ChatRequest
+from app.schemas.chat_response import ChatResponse
+from app.graph.supervisor_graph import supervisor_graph
+from app.utils.message_utils import extract_text
 
-router = APIRouter(prefix="/api")
+router = APIRouter(prefix="/chat", tags=["Chat"])
 
 
-class ChatRequest(BaseModel):
-    message: str
-
-
-@router.post("/chat")
+@router.post("/", response_model=ChatResponse)
 def chat(request: ChatRequest):
-    return ask(request.message)
+
+    config = {
+        "configurable": {
+            "thread_id": request.thread_id
+        }
+    }
+
+    result = supervisor_graph.invoke(
+        {
+            "messages": [
+                HumanMessage(content=request.message)
+            ]
+        },
+        config=config,
+    )
+
+    last_message = result["messages"][-1]
+    response = extract_text(last_message)
+
+    return ChatResponse(response=response)
