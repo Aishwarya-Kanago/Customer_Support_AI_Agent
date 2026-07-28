@@ -1,27 +1,20 @@
 from langchain_core.messages import HumanMessage
 
-from app.graph.graph_builder import graph
+from app.graph.billing_graph import billing_graph
 
-config = {
-    "configurable": {
-        "thread_id": "customer-1"
-    }
-}
-
-result = graph.invoke(
+result = billing_graph.invoke(
     {
         "messages": [
-            HumanMessage(content="What is your refund policy?")
+            HumanMessage(
+                content="Why did my payment fail?"
+            )
         ]
     },
-    config=config,
+    config={
+        "configurable": {
+            "thread_id": "customer-1"
+        }
+    }
 )
 
-for message in result["messages"]:
-    print(type(message).__name__)
-    if isinstance(message.content, list):
-        for part in message.content:
-            if part.get("type") == "text":
-                print(part["text"])
-    else:
-        print(message.content)
+print(result["messages"][-1].content)

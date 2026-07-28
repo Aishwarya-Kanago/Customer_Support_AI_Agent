@@ -18,3 +18,17 @@ def route_request(state):
         return "retriever"
 
     return "agent"
+
+
+def get_next_graph(route: str):
+
+    if route == "OrderAgent":
+        return "order"
+
+    if route == "KnowledgeAgent":
+        return "knowledge"
+
+    if route == "BillingAgent":
+        return "billing"
+
+    raise ValueError(f"Unknown route: {route}")

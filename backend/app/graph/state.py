@@ -7,4 +7,6 @@ from typing_extensions import TypedDict
 class AgentState(TypedDict):
     messages: Annotated[list, add_messages]
 
-    documents: list[str]
+    documents: list
+
+    route: str | None
